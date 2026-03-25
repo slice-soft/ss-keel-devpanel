@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.1.0...v1.2.0) (2026-03-25)
+
+
+### Features
+
+* **ui:** add layout and requests/routes templates ([#6](https://github.com/slice-soft/ss-keel-devpanel/issues/6)) ([4ea4b3f](https://github.com/slice-soft/ss-keel-devpanel/commit/4ea4b3f95412247b98181540e1e9def69cd2d158))
+
 ## [1.1.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.0.0...v1.1.0) (2026-03-25)
 
 
