@@ -15,8 +15,8 @@ type debuggableMock struct {
 	ch    chan contracts.PanelEvent
 }
 
-func (d *debuggableMock) PanelID() string                    { return d.id }
-func (d *debuggableMock) PanelLabel() string                 { return d.label }
+func (d *debuggableMock) PanelID() string                          { return d.id }
+func (d *debuggableMock) PanelLabel() string                       { return d.label }
 func (d *debuggableMock) PanelEvents() <-chan contracts.PanelEvent { return d.ch }
 
 // --- tests ---
@@ -110,8 +110,17 @@ func TestManifest(t *testing.T) {
 	}
 
 	for _, ev := range m.EnvVars {
+		if ev.Key == "KEEL_PANEL_ENABLED" && ev.ConfigKey != "panel.enabled" {
+			t.Fatalf("KEEL_PANEL_ENABLED ConfigKey = %q, want %q", ev.ConfigKey, "panel.enabled")
+		}
 		if ev.Key == "KEEL_PANEL_SECRET" && !ev.Secret {
 			t.Fatal("KEEL_PANEL_SECRET should be marked as secret")
+		}
+		if ev.Key == "KEEL_PANEL_SECRET" && ev.ConfigKey != "panel.secret" {
+			t.Fatalf("KEEL_PANEL_SECRET ConfigKey = %q, want %q", ev.ConfigKey, "panel.secret")
+		}
+		if ev.Key == "KEEL_PANEL_PATH" && ev.ConfigKey != "panel.path" {
+			t.Fatalf("KEEL_PANEL_PATH ConfigKey = %q, want %q", ev.ConfigKey, "panel.path")
 		}
 	}
 }

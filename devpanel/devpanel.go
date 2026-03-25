@@ -106,6 +106,7 @@ func (p *DevPanel) Manifest() contracts.AddonManifest {
 		EnvVars: []contracts.EnvVar{
 			{
 				Key:         "KEEL_PANEL_ENABLED",
+				ConfigKey:   "panel.enabled",
 				Description: "Enable the dev panel UI (should be false in production)",
 				Required:    false,
 				Secret:      false,
@@ -114,6 +115,7 @@ func (p *DevPanel) Manifest() contracts.AddonManifest {
 			},
 			{
 				Key:         "KEEL_PANEL_SECRET",
+				ConfigKey:   "panel.secret",
 				Description: "Bearer token required to access the panel. Leave empty to disable auth.",
 				Required:    false,
 				Secret:      true,
@@ -122,6 +124,7 @@ func (p *DevPanel) Manifest() contracts.AddonManifest {
 			},
 			{
 				Key:         "KEEL_PANEL_PATH",
+				ConfigKey:   "panel.path",
 				Description: "URL prefix for all panel routes",
 				Required:    false,
 				Secret:      false,

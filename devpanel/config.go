@@ -5,15 +5,15 @@ package devpanel
 type Config struct {
 	// Enabled controls whether the panel is active.
 	// Defaults to true; set to false in production.
-	Enabled bool
+	Enabled bool `keel:"panel.enabled,required"`
 
 	// Secret is an optional bearer token that protects the panel routes.
 	// When set, all requests must include: Authorization: Bearer <secret>
-	Secret string
+	Secret string `keel:"panel.secret"`
 
 	// Path is the URL prefix for all panel routes.
 	// Defaults to "/keel/panel".
-	Path string
+	Path string `keel:"panel.path,required"`
 }
 
 func (c *Config) setDefaults() {
