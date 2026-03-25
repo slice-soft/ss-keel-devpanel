@@ -5,6 +5,7 @@ import (
 	"runtime"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/slice-soft/ss-keel-core/config"
 	"github.com/slice-soft/ss-keel-core/contracts"
 	"github.com/slice-soft/ss-keel-devpanel/devpanel/ui"
 )
@@ -44,6 +45,11 @@ func (p *DevPanel) buildEnvVarRows() []ui.EnvVarRow {
 	rows := make([]ui.EnvVarRow, len(vars))
 	for i, v := range vars {
 		value := os.Getenv(v.Key)
+		if value == "" && v.ConfigKey != "" {
+			if resolved, ok := config.LookupString(v.ConfigKey); ok {
+				value = resolved
+			}
+		}
 		if v.Secret && value != "" {
 			value = redacted
 		}

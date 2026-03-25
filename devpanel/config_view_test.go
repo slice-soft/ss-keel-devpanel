@@ -4,9 +4,11 @@ import (
 	"io"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/slice-soft/ss-keel-core/config"
 	"github.com/slice-soft/ss-keel-core/contracts"
 	"github.com/slice-soft/ss-keel-devpanel/devpanel"
 )
@@ -23,10 +25,10 @@ func newManifestMock(id, label string, manifest contracts.AddonManifest) *manife
 	return &manifestMock{id: id, label: label, manifest: manifest, ch: make(chan contracts.PanelEvent, 8)}
 }
 
-func (m *manifestMock) PanelID() string                         { return m.id }
-func (m *manifestMock) PanelLabel() string                      { return m.label }
+func (m *manifestMock) PanelID() string                          { return m.id }
+func (m *manifestMock) PanelLabel() string                       { return m.label }
 func (m *manifestMock) PanelEvents() <-chan contracts.PanelEvent { return m.ch }
-func (m *manifestMock) Manifest() contracts.AddonManifest       { return m.manifest }
+func (m *manifestMock) Manifest() contracts.AddonManifest        { return m.manifest }
 
 func configPage(t *testing.T, p *devpanel.DevPanel) string {
 	t.Helper()
@@ -112,6 +114,36 @@ func TestConfigPage_nonSecretValueVisible(t *testing.T) {
 	}
 }
 
+func TestConfigPage_nonSecretValueVisibleFromApplicationProperties(t *testing.T) {
+	tmpDir := t.TempDir()
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("os.Getwd: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "application.properties"), []byte("panel.path=/properties-panel\n"), 0o644); err != nil {
+		t.Fatalf("os.WriteFile: %v", err)
+	}
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("os.Chdir: %v", err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chdir(cwd)
+		_ = config.LoadApplicationProperties()
+	})
+	if err := config.LoadApplicationProperties(); err != nil {
+		t.Fatalf("LoadApplicationProperties: %v", err)
+	}
+
+	p := devpanel.New(devpanel.Config{Enabled: true})
+	defer p.Shutdown()
+
+	html := configPage(t, p)
+
+	if !contains(html, "/properties-panel") {
+		t.Error("application.properties value should be visible in config page")
+	}
+}
+
 func TestConfigPage_emptySecretNotRedacted(t *testing.T) {
 	os.Unsetenv("KEEL_PANEL_SECRET")
 
@@ -138,7 +170,7 @@ func TestConfigPage_addonCapabilitiesAndResources(t *testing.T) {
 		Capabilities: []string{"database"},
 		Resources:    []string{"postgres"},
 		EnvVars: []contracts.EnvVar{
-			{Key: "DB_DSN", Required: true, Secret: true, Source: "gorm"},
+			{Key: "DB_DSN", ConfigKey: "database.url", Required: true, Secret: true, Source: "gorm"},
 		},
 	}))
 
@@ -167,7 +199,7 @@ func TestConfigPage_addonSecretEnvVarRedacted(t *testing.T) {
 	p.RegisterAddon(newManifestMock("gorm", "GORM", contracts.AddonManifest{
 		ID: "gorm",
 		EnvVars: []contracts.EnvVar{
-			{Key: "DB_DSN", Required: true, Secret: true, Source: "gorm"},
+			{Key: "DB_DSN", ConfigKey: "database.url", Required: true, Secret: true, Source: "gorm"},
 		},
 	}))
 

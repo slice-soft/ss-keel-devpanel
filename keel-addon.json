@@ -9,6 +9,24 @@
       "package": "github.com/slice-soft/ss-keel-devpanel"
     },
     {
+      "type": "property",
+      "key": "panel.enabled",
+      "example": "${KEEL_PANEL_ENABLED:true}",
+      "description": "Enable or disable the dev panel."
+    },
+    {
+      "type": "property",
+      "key": "panel.secret",
+      "example": "${KEEL_PANEL_SECRET:}",
+      "description": "Optional bearer token used to protect panel routes."
+    },
+    {
+      "type": "property",
+      "key": "panel.path",
+      "example": "${KEEL_PANEL_PATH:/keel/panel}",
+      "description": "URL prefix for all panel routes."
+    },
+    {
       "type": "env",
       "key": "KEEL_PANEL_ENABLED",
       "example": "true",
@@ -30,7 +48,7 @@
       "type": "create_provider_file",
       "filename": "cmd/setup_devpanel.go",
       "guard": "func setupDevPanel(",
-      "content": "package main\n\nimport (\n\t\"github.com/slice-soft/ss-keel-core/config\"\n\t\"github.com/slice-soft/ss-keel-core/core\"\n\t\"github.com/slice-soft/ss-keel-devpanel/devpanel\"\n)\n\n// setupDevPanel mounts the real-time observability panel on the Fiber app.\n// Set KEEL_PANEL_ENABLED=false in production to disable the panel.\nfunc setupDevPanel(app *core.App) *devpanel.DevPanel {\n\tpanel := devpanel.New(devpanel.Config{\n\t\tEnabled: config.GetEnvOrDefault(\"KEEL_PANEL_ENABLED\", \"true\") != \"false\",\n\t\tSecret:  config.GetEnvOrDefault(\"KEEL_PANEL_SECRET\", \"\"),\n\t\tPath:    config.GetEnvOrDefault(\"KEEL_PANEL_PATH\", \"/keel/panel\"),\n\t})\n\tfiberApp := app.Fiber()\n\tfiberApp.Use(panel.RequestMiddleware())\n\tfiberApp.Use(panel.GlobalGuard())\n\tpanel.Mount(fiberApp)\n\treturn panel\n}\n"
+      "content": "package main\n\nimport (\n\t\"github.com/slice-soft/ss-keel-core/config\"\n\t\"github.com/slice-soft/ss-keel-core/core\"\n\t\"github.com/slice-soft/ss-keel-devpanel/devpanel\"\n)\n\n// setupDevPanel mounts the real-time observability panel on the Fiber app.\n// Set panel.enabled=false in production to disable the panel.\nfunc setupDevPanel(app *core.App) *devpanel.DevPanel {\n\tpanelConfig := config.MustLoadConfig[devpanel.Config]()\n\tpanel := devpanel.New(panelConfig)\n\tfiberApp := app.Fiber()\n\tfiberApp.Use(panel.RequestMiddleware())\n\tfiberApp.Use(panel.GlobalGuard())\n\tpanel.Mount(fiberApp)\n\treturn panel\n}\n"
     },
     {
       "type": "main_code",
