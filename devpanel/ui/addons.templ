@@ -6,6 +6,7 @@ type AddonRow struct {
 	Label        string
 	Capabilities []string
 	Resources    []string
+	DetailURL    string // link to the addon's event stream detail page
 }
 
 templ Addons(nav []NavItem, rows []AddonRow) {
@@ -21,17 +22,27 @@ templ Addons(nav []NavItem, rows []AddonRow) {
 				</div>
 			} else {
 				for _, a := range rows {
-					<div class="card">
-						<div class="card-title">{ a.ID }</div>
-						<div style="color: var(--fg-muted); margin-bottom: 8px; font-size: 13px;">{ a.Label }</div>
-						<div style="display: flex; gap: 6px; flex-wrap: wrap;">
-							for _, cap := range a.Capabilities {
-								<span class="badge badge-blue">{ cap }</span>
-							}
-							for _, res := range a.Resources {
-								<span class="badge badge-gray">{ res }</span>
-							}
+					<div class="card" style="display:flex;align-items:center;justify-content:space-between;">
+						<div>
+							<div class="card-title">{ a.ID }</div>
+							<div style="color:var(--fg-muted);margin-bottom:8px;font-size:13px;">{ a.Label }</div>
+							<div style="display:flex;gap:6px;flex-wrap:wrap;">
+								for _, cap := range a.Capabilities {
+									<span class="badge badge-blue">{ cap }</span>
+								}
+								for _, res := range a.Resources {
+									<span class="badge badge-gray">{ res }</span>
+								}
+							</div>
 						</div>
+						if a.DetailURL != "" {
+							<a
+								href={ templ.SafeURL(a.DetailURL) }
+								style="color:var(--accent);font-size:13px;text-decoration:none;white-space:nowrap;"
+							>
+								View events →
+							</a>
+						}
 					</div>
 				}
 			}
