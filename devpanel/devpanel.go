@@ -1,6 +1,7 @@
 package devpanel
 
 import (
+	"context"
 	"sync"
 
 	"github.com/slice-soft/ss-keel-core/contracts"
@@ -19,9 +20,12 @@ type DevPanel struct {
 	cfg      Config
 	mu       sync.RWMutex
 	addons   []contracts.Debuggable
+	streams  map[string]*addonStream // keyed by PanelID
 	requests *requestBuffer
 	logs     *logBuffer
 	logBcast *sseBroadcaster[LogEntry]
+	ctx      context.Context
+	cancel   context.CancelFunc
 }
 
 // Compile-time assertions.
@@ -34,11 +38,20 @@ var (
 // New creates a new DevPanel with the given configuration.
 func New(cfg Config) *DevPanel {
 	cfg.setDefaults()
+	ctx, cancel := context.WithCancel(context.Background())
 	return &DevPanel{
 		cfg:      cfg,
+		streams:  make(map[string]*addonStream),
 		logs:     newLogBuffer(logBufferSize),
 		logBcast: newSSEBroadcaster[LogEntry](),
+		ctx:      ctx,
+		cancel:   cancel,
 	}
+}
+
+// Shutdown stops all addon goroutines. Call it when the application shuts down.
+func (p *DevPanel) Shutdown() {
+	p.cancel()
 }
 
 // Logger returns the panel's PanelLogger, which implements contracts.Logger.
@@ -56,12 +69,18 @@ func (p *DevPanel) Logs() []LogEntry {
 // ID returns the unique identifier for this addon.
 func (p *DevPanel) ID() string { return "devpanel" }
 
-// RegisterAddon adds a Debuggable addon to the panel registry.
+// RegisterAddon adds a Debuggable addon to the panel registry and starts a
+// goroutine that consumes its PanelEvents() channel.
 // Safe for concurrent use.
 func (p *DevPanel) RegisterAddon(d contracts.Debuggable) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
+	id := d.PanelID()
+	if _, exists := p.streams[id]; exists {
+		return // already registered — idempotent
+	}
 	p.addons = append(p.addons, d)
+	p.streams[id] = p.startAddonStream(p.ctx, d)
 }
 
 // Addons returns a snapshot of all registered Debuggable addons.

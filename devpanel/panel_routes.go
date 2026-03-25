@@ -37,6 +37,8 @@ func (p *DevPanel) Mount(router *fiber.App) {
 	g.Get("/logs/stream", p.handleLogsStream())
 	g.Get("/routes", p.handleRoutes())
 	g.Get("/addons", p.handleAddons())
+	g.Get("/addons/:id", p.handleAddonDetail())
+	g.Get("/addons/:id/stream", p.handleAddonStream())
 }
 
 // render writes a templ component to the Fiber response.
@@ -91,10 +93,7 @@ func (p *DevPanel) handleAddons() fiber.Handler {
 		registered := p.Addons()
 		rows := make([]ui.AddonRow, len(registered))
 		for i, a := range registered {
-			rows[i] = ui.AddonRow{
-				ID:    a.PanelID(),
-				Label: a.PanelLabel(),
-			}
+			rows[i] = addonToRow(a, p.cfg.Path)
 		}
 		return render(c, ui.Addons(p.buildNav("Addons"), rows))
 	}

@@ -1,0 +1,84 @@
+package ui
+
+// AddonEventRow is the view model for a single addon panel event.
+type AddonEventRow struct {
+	Label  string
+	Level  string
+	Detail map[string]string // flattened for display
+}
+
+templ AddonDetail(nav []NavItem, addon AddonRow, streamURL string) {
+	@Layout(addon.Label + " Events", nav) {
+		<div class="topbar">
+			<h1>{ addon.Label }</h1>
+			<div style="display:flex;gap:6px;align-items:center;">
+				for _, cap := range addon.Capabilities {
+					<span class="badge badge-blue">{ cap }</span>
+				}
+				for _, res := range addon.Resources {
+					<span class="badge badge-gray">{ res }</span>
+				}
+				<span id="addon-sse-status" style="margin-left:8px;font-size:11px;color:var(--fg-muted);">connecting…</span>
+			</div>
+		</div>
+		<div class="content" style="padding:0;" data-stream-url={ streamURL }>
+			<table id="event-table">
+				<thead>
+					<tr>
+						<th style="width:110px;">Time</th>
+						<th style="width:80px;">Level</th>
+						<th>Label</th>
+						<th>Detail</th>
+					</tr>
+				</thead>
+				<tbody id="event-body"></tbody>
+			</table>
+		</div>
+		<script>
+			var content = document.querySelector('.content');
+			var autoScroll = true;
+
+			var es = new EventSource(content.getAttribute('data-stream-url'));
+			es.onopen = function() {
+				document.getElementById('addon-sse-status').textContent = 'live';
+				document.getElementById('addon-sse-status').style.color = 'var(--green)';
+			};
+			es.onerror = function() {
+				document.getElementById('addon-sse-status').textContent = 'disconnected';
+				document.getElementById('addon-sse-status').style.color = 'var(--red)';
+			};
+			es.addEventListener('event', function(e) {
+				var data = JSON.parse(e.data);
+				var tbody = document.getElementById('event-body');
+				var tr = document.createElement('tr');
+				tr.innerHTML =
+					'<td style="font-family:var(--font-mono);font-size:12px;">' + esc(data.time) + '</td>' +
+					'<td>' + levelBadge(data.level) + '</td>' +
+					'<td style="font-family:var(--font-mono);font-size:12px;">' + esc(data.label) + '</td>' +
+					'<td style="font-family:var(--font-mono);font-size:12px;">' + renderDetail(data.detail) + '</td>';
+				tbody.appendChild(tr);
+				if (autoScroll) content.scrollTop = content.scrollHeight;
+			});
+
+			content.addEventListener('scroll', function() {
+				autoScroll = content.scrollTop + content.clientHeight >= content.scrollHeight - 20;
+			});
+
+			function levelBadge(l) {
+				var cls = {info:'badge-blue', warn:'badge-yellow', error:'badge-red'}[l] || 'badge-gray';
+				return '<span class="badge ' + cls + '">' + esc(l) + '</span>';
+			}
+
+			function renderDetail(detail) {
+				if (!detail || !Object.keys(detail).length) return '<span style="color:var(--fg-muted)">—</span>';
+				return Object.entries(detail)
+					.map(function(kv) { return '<span style="color:var(--fg-muted)">' + esc(kv[0]) + ':</span> ' + esc(String(kv[1])); })
+					.join(' &nbsp;·&nbsp; ');
+			}
+
+			function esc(s) {
+				return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+			}
+		</script>
+	}
+}
