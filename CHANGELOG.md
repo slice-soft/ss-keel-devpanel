@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.2.0...v1.3.0) (2026-03-25)
+
+
+### Features
+
+* **logs:** implement SSE logging with real-time updates and UI enhancements ([#8](https://github.com/slice-soft/ss-keel-devpanel/issues/8)) ([b3fc35b](https://github.com/slice-soft/ss-keel-devpanel/commit/b3fc35b0ef8689e4f1a9f5ff8d807bfeedde707e))
+
 ## [1.2.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.1.0...v1.2.0) (2026-03-25)
 
 
