@@ -6,6 +6,7 @@ Observability dev panel for [Keel](https://keel-go.dev) applications.
 Provides a real-time UI to inspect requests, logs, addon events, routes, and configuration — all embedded in your Go binary.
 
 [![CI](https://github.com/slice-soft/ss-keel-devpanel/actions/workflows/ci.yml/badge.svg)](https://github.com/slice-soft/ss-keel-devpanel/actions)
+[![Release](https://img.shields.io/github/v/release/slice-soft/ss-keel-devpanel)](https://github.com/slice-soft/ss-keel-devpanel/releases)
 ![Go](https://img.shields.io/badge/Go-1.25+-00ADD8?logo=go&logoColor=white)
 [![Go Report Card](https://goreportcard.com/badge/github.com/slice-soft/ss-keel-devpanel)](https://goreportcard.com/report/github.com/slice-soft/ss-keel-devpanel)
 [![Go Reference](https://pkg.go.dev/badge/github.com/slice-soft/ss-keel-devpanel.svg)](https://pkg.go.dev/github.com/slice-soft/ss-keel-devpanel)
