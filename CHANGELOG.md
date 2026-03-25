@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.6.0...v1.7.0) (2026-03-25)
+
+
+### Features
+
+* enhance README and keel-addon.json with installation instructions and environment variable setup ([#16](https://github.com/slice-soft/ss-keel-devpanel/issues/16)) ([488fb93](https://github.com/slice-soft/ss-keel-devpanel/commit/488fb937f7f6838ec469fc58ab95d4126a8463ab))
+
 ## [1.6.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.5.0...v1.6.0) (2026-03-25)
 
 
