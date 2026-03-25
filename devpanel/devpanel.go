@@ -100,7 +100,7 @@ func (p *DevPanel) Config() Config { return p.cfg }
 func (p *DevPanel) Manifest() contracts.AddonManifest {
 	return contracts.AddonManifest{
 		ID:           "devpanel",
-		Version:      "0.1.0",
+		Version:      "1.0.0",
 		Capabilities: []string{"observability"},
 		Resources:    []string{},
 		EnvVars: []contracts.EnvVar{
