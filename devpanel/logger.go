@@ -69,29 +69,35 @@ func (b *logBuffer) snapshot() []LogEntry {
 }
 
 // PanelLogger implements contracts.Logger and captures every log line into
-// the panel's ring buffer.
+// the panel's ring buffer. New entries are also broadcast to active SSE clients.
 //
 // Use WithRequestID to get a scoped copy that tags entries with a request ID:
 //
 //	logger := panel.Logger().WithRequestID(c.Locals("request_id").(string))
 type PanelLogger struct {
 	buf       *logBuffer
+	bcast     *sseBroadcaster[LogEntry]
 	requestID string
 }
 
 // WithRequestID returns a shallow copy of PanelLogger that tags every entry
-// it writes with the given request ID. The underlying buffer is shared.
+// it writes with the given request ID. The underlying buffer and broadcaster
+// are shared.
 func (l *PanelLogger) WithRequestID(id string) *PanelLogger {
-	return &PanelLogger{buf: l.buf, requestID: id}
+	return &PanelLogger{buf: l.buf, bcast: l.bcast, requestID: id}
 }
 
 func (l *PanelLogger) log(level LogLevel, format string, args ...interface{}) {
-	l.buf.push(LogEntry{
+	entry := LogEntry{
 		Timestamp: time.Now(),
 		Level:     level,
 		Message:   fmt.Sprintf(format, args...),
 		RequestID: l.requestID,
-	})
+	}
+	l.buf.push(entry)
+	if l.bcast != nil {
+		l.bcast.broadcast(entry)
+	}
 }
 
 func (l *PanelLogger) Debug(format string, args ...interface{}) { l.log(LogLevelDebug, format, args...) }

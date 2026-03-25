@@ -1,0 +1,136 @@
+package ui
+
+import "time"
+
+// LogRow is the view model for a single log entry.
+type LogRow struct {
+	Timestamp time.Time
+	Level     string
+	Message   string
+	RequestID string
+}
+
+templ Logs(nav []NavItem, rows []LogRow, streamURL string) {
+	@Layout("Logs", nav) {
+		<div class="topbar">
+			<h1>Logs</h1>
+			<div style="display:flex;gap:8px;align-items:center;">
+				<input
+					id="log-search"
+					type="text"
+					placeholder="Search…"
+					oninput="filterLogs()"
+					style="background:var(--surface-2);border:1px solid var(--border);color:var(--fg);padding:4px 10px;border-radius:var(--radius);font-size:13px;width:200px;"
+				/>
+				<select
+					id="log-level"
+					onchange="filterLogs()"
+					style="background:var(--surface-2);border:1px solid var(--border);color:var(--fg);padding:4px 8px;border-radius:var(--radius);font-size:13px;"
+				>
+					<option value="">All levels</option>
+					<option value="debug">Debug</option>
+					<option value="info">Info</option>
+					<option value="warn">Warn</option>
+					<option value="error">Error</option>
+				</select>
+				<button
+					onclick="clearLogs()"
+					style="background:var(--surface-2);border:1px solid var(--border);color:var(--fg-muted);padding:4px 10px;border-radius:var(--radius);font-size:13px;cursor:pointer;"
+				>
+					Clear
+				</button>
+				<span id="sse-status" style="font-size:11px;color:var(--fg-muted);">connecting…</span>
+			</div>
+		</div>
+		<div class="content" style="padding:0;" data-stream-url={ streamURL }>
+			<table id="log-table">
+				<thead>
+					<tr>
+						<th style="width:100px;">Level</th>
+						<th style="width:110px;">Time</th>
+						<th>Message</th>
+						<th style="width:220px;">Request ID</th>
+					</tr>
+				</thead>
+				<tbody id="log-body">
+					for _, r := range rows {
+						@logRow(r)
+					}
+				</tbody>
+			</table>
+		</div>
+		<script>
+			var autoScroll = true;
+			var content = document.querySelector('.content');
+
+			// SSE — URL injected via data attribute to avoid templ script-block limitations.
+			var es = new EventSource(content.getAttribute('data-stream-url'));
+			es.onopen = function() {
+				document.getElementById('sse-status').textContent = 'live';
+				document.getElementById('sse-status').style.color = 'var(--green)';
+			};
+			es.onerror = function() {
+				document.getElementById('sse-status').textContent = 'disconnected';
+				document.getElementById('sse-status').style.color = 'var(--red)';
+			};
+			es.addEventListener('log', function(e) {
+				var data = JSON.parse(e.data);
+				var tbody = document.getElementById('log-body');
+				var tr = document.createElement('tr');
+				tr.setAttribute('data-level', data.level);
+				tr.setAttribute('data-msg', data.message.toLowerCase());
+				tr.innerHTML =
+					'<td>' + levelBadge(data.level) + '</td>' +
+					'<td style="font-family:var(--font-mono);font-size:12px;">' + data.time + '</td>' +
+					'<td style="font-family:var(--font-mono);font-size:12px;">' + escHtml(data.message) + '</td>' +
+					'<td style="font-family:var(--font-mono);font-size:12px;">' + escHtml(data.request_id) + '</td>';
+				tbody.appendChild(tr);
+				applyFilter(tr);
+				if (autoScroll) content.scrollTop = content.scrollHeight;
+			});
+
+			content.addEventListener('scroll', function() {
+				autoScroll = content.scrollTop + content.clientHeight >= content.scrollHeight - 20;
+			});
+
+			function levelBadge(l) {
+				var cls = {debug:'badge-gray', info:'badge-blue', warn:'badge-yellow', error:'badge-red'}[l] || 'badge-gray';
+				return '<span class="badge ' + cls + '">' + l + '</span>';
+			}
+
+			function escHtml(s) {
+				return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+			}
+
+			function applyFilter(tr) {
+				var q = (document.getElementById('log-search').value||'').toLowerCase();
+				var lvl = document.getElementById('log-level').value;
+				var msg = tr.getAttribute('data-msg')||'';
+				var rowLvl = tr.getAttribute('data-level')||'';
+				var show = (!lvl || rowLvl === lvl) && (!q || msg.includes(q));
+				tr.style.display = show ? '' : 'none';
+			}
+
+			function filterLogs() {
+				document.querySelectorAll('#log-body tr').forEach(applyFilter);
+			}
+
+			function clearLogs() {
+				document.getElementById('log-body').innerHTML = '';
+			}
+		</script>
+	}
+}
+
+templ logRow(r LogRow) {
+	<tr data-level={ r.Level } data-msg={ r.Message }>
+		<td>{ levelBadgeText(r.Level) }</td>
+		<td style="font-family:var(--font-mono);font-size:12px;">{ r.Timestamp.Format("15:04:05.000") }</td>
+		<td style="font-family:var(--font-mono);font-size:12px;">{ r.Message }</td>
+		<td style="font-family:var(--font-mono);font-size:12px;">{ r.RequestID }</td>
+	</tr>
+}
+
+func levelBadgeText(level string) string {
+	return level
+}
