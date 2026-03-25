@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.7.1...v1.8.0) (2026-03-25)
+
+
+### Features
+
+* add release badge to README for better visibility of versioning ([#20](https://github.com/slice-soft/ss-keel-devpanel/issues/20)) ([e3c3814](https://github.com/slice-soft/ss-keel-devpanel/commit/e3c381421879543281146a482d91e94f617fda05))
+
 ## [1.7.1](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.7.0...v1.7.1) (2026-03-25)
 
 
