@@ -16,9 +16,10 @@ import (
 //	    panel.RegisterAddon(myAddon)
 //	}
 type DevPanel struct {
-	cfg    Config
-	mu     sync.RWMutex
-	addons []contracts.Debuggable
+	cfg      Config
+	mu       sync.RWMutex
+	addons   []contracts.Debuggable
+	requests *requestBuffer
 }
 
 // Compile-time assertions.
