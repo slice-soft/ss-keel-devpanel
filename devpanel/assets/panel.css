@@ -1,0 +1,197 @@
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface-2: #21262d;
+  --border: #30363d;
+  --fg: #e6edf3;
+  --fg-muted: #8b949e;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --radius: 6px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 14px;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 200px;
+  min-width: 200px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+}
+
+.sidebar-logo {
+  padding: 0 16px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.sidebar-logo span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sidebar-logo strong {
+  display: block;
+  font-size: 15px;
+  color: var(--fg);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: var(--fg-muted);
+  text-decoration: none;
+  border-radius: 0;
+  transition: background 0.15s, color 0.15s;
+  font-size: 13px;
+}
+
+.nav-item:hover {
+  background: var(--surface-2);
+  color: var(--fg);
+}
+
+.nav-item.active {
+  background: var(--surface-2);
+  color: var(--accent);
+  border-left: 2px solid var(--accent);
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  min-height: 48px;
+}
+
+.topbar h1 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* ── Table ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg-muted);
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr:hover td { background: var(--surface-2); }
+
+/* ── Badges ── */
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.badge-green  { background: rgba(63,185,80,.15); color: var(--green); }
+.badge-yellow { background: rgba(210,153,34,.15); color: var(--yellow); }
+.badge-red    { background: rgba(248,81,73,.15);  color: var(--red); }
+.badge-blue   { background: rgba(59,130,246,.15); color: var(--accent); }
+.badge-gray   { background: var(--surface-2);     color: var(--fg-muted); }
+
+/* ── Method badges ── */
+.method-get     { color: var(--green);  }
+.method-post    { color: var(--accent); }
+.method-put, .method-patch { color: var(--yellow); }
+.method-delete  { color: var(--red);    }
+
+/* ── Empty state ── */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--fg-muted);
+}
+
+.empty p { margin-top: 8px; font-size: 13px; }
+
+/* ── Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* ── Latency color ── */
+.latency-fast   { color: var(--green);  }
+.latency-medium { color: var(--yellow); }
+.latency-slow   { color: var(--red);    }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }

@@ -1,0 +1,40 @@
+package ui
+
+// AddonRow is the view model for a registered addon in the panel.
+type AddonRow struct {
+	ID           string
+	Label        string
+	Capabilities []string
+	Resources    []string
+}
+
+templ Addons(nav []NavItem, rows []AddonRow) {
+	@Layout("Addons", nav) {
+		<div class="topbar">
+			<h1>Addons</h1>
+		</div>
+		<div class="content">
+			if len(rows) == 0 {
+				<div class="empty">
+					<strong>No addons registered</strong>
+					<p>Addons that implement Debuggable will appear here once registered.</p>
+				</div>
+			} else {
+				for _, a := range rows {
+					<div class="card">
+						<div class="card-title">{ a.ID }</div>
+						<div style="color: var(--fg-muted); margin-bottom: 8px; font-size: 13px;">{ a.Label }</div>
+						<div style="display: flex; gap: 6px; flex-wrap: wrap;">
+							for _, cap := range a.Capabilities {
+								<span class="badge badge-blue">{ cap }</span>
+							}
+							for _, res := range a.Resources {
+								<span class="badge badge-gray">{ res }</span>
+							}
+						</div>
+					</div>
+				}
+			}
+		</div>
+	}
+}

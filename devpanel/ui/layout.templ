@@ -1,0 +1,40 @@
+package ui
+
+// NavItem represents a sidebar navigation entry.
+type NavItem struct {
+	Label  string
+	Path   string
+	Active bool
+}
+
+templ Layout(title string, nav []NavItem) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title } · Keel DevPanel</title>
+			<link rel="stylesheet" href="assets/panel.css"/>
+			<script src="assets/htmx.min.js" defer></script>
+		</head>
+		<body>
+			<aside class="sidebar">
+				<div class="sidebar-logo">
+					<span>Keel</span>
+					<strong>DevPanel</strong>
+				</div>
+				for _, item := range nav {
+					<a
+						href={ templ.SafeURL(item.Path) }
+						class={ "nav-item", templ.KV("active", item.Active) }
+					>
+						{ item.Label }
+					</a>
+				}
+			</aside>
+			<div class="main">
+				{ children... }
+			</div>
+		</body>
+	</html>
+}

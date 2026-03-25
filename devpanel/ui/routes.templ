@@ -1,0 +1,40 @@
+package ui
+
+// RouteRow is the view model for a single registered route.
+type RouteRow struct {
+	Method string
+	Path   string
+}
+
+templ Routes(nav []NavItem, rows []RouteRow) {
+	@Layout("Routes", nav) {
+		<div class="topbar">
+			<h1>Routes</h1>
+		</div>
+		<div class="content">
+			if len(rows) == 0 {
+				<div class="empty">
+					<strong>No routes registered</strong>
+					<p>Routes registered with app.RegisterController will appear here.</p>
+				</div>
+			} else {
+				<table>
+					<thead>
+						<tr>
+							<th>Method</th>
+							<th>Path</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, r := range rows {
+							<tr>
+								<td><span class={ "method-" + methodClass(r.Method) }>{ r.Method }</span></td>
+								<td>{ r.Path }</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</div>
+	}
+}
