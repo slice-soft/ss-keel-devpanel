@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.4.0...v1.5.0) (2026-03-25)
+
+
+### Features
+
+* **config:** add config page with environment variables and runtime info ([#12](https://github.com/slice-soft/ss-keel-devpanel/issues/12)) ([00c9aeb](https://github.com/slice-soft/ss-keel-devpanel/commit/00c9aeb10a9b8cda1ca858fb1aecb019bb942ec3))
+
 ## [1.4.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.3.0...v1.4.0) (2026-03-25)
 
 
