@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.3.0...v1.4.0) (2026-03-25)
+
+
+### Features
+
+* **addons:** implement addon event streaming and detail view ([#10](https://github.com/slice-soft/ss-keel-devpanel/issues/10)) ([b8c94de](https://github.com/slice-soft/ss-keel-devpanel/commit/b8c94de5a30f1a8a0b1dc7468f76f946966790cf))
+
 ## [1.3.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.2.0...v1.3.0) (2026-03-25)
 
 
