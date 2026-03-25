@@ -1,20 +1,14 @@
 {
-  "name": "my-addon",
+  "name": "devpanel",
   "version": "0.1.0",
-  "description": "Description of my addon",
+  "description": "Real-time observability UI for Keel applications — requests, logs, addon events and config",
   "register": true,
-  "repo": "github.com/your-user/your-repo",
+  "repo": "github.com/slice-soft/ss-keel-devpanel",
   "steps": [
     {
       "file": "cmd/main.go",
       "action": "append",
-      "snippet": "// TODO: add addon initialization here",
-      "flags": []
-    },
-    {
-      "file": "config/config.go",
-      "action": "append",
-      "snippet": "// TODO: add addon configuration here",
+      "snippet": "// TODO: initialize devpanel\n// panel := devpanel.New(devpanel.Config{Enabled: !cfg.IsProd()})\n// app.Use(panel)",
       "flags": []
     }
   ]
