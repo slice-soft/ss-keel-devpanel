@@ -1,0 +1,99 @@
+package ui
+
+import (
+	"fmt"
+	"time"
+)
+
+// RequestRow is the view model for a single request entry.
+type RequestRow struct {
+	ID        string
+	Timestamp time.Time
+	Method    string
+	Path      string
+	Status    int
+	LatencyMS float64
+	RequestID string
+}
+
+templ Requests(nav []NavItem, rows []RequestRow) {
+	@Layout("Requests", nav) {
+		<div class="topbar">
+			<h1>Requests</h1>
+		</div>
+		<div class="content">
+			if len(rows) == 0 {
+				<div class="empty">
+					<strong>No requests captured yet</strong>
+					<p>Make a request to your app and it will appear here.</p>
+				</div>
+			} else {
+				<table>
+					<thead>
+						<tr>
+							<th>Method</th>
+							<th>Path</th>
+							<th>Status</th>
+							<th>Latency</th>
+							<th>Time</th>
+							<th>Request ID</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, r := range rows {
+							<tr>
+								<td><span class={ "method-" + methodClass(r.Method) }>{ r.Method }</span></td>
+								<td>{ r.Path }</td>
+								<td>{ statusBadge(r.Status) }</td>
+								<td class={ latencyClass(r.LatencyMS) }>{ fmt.Sprintf("%.1fms", r.LatencyMS) }</td>
+								<td>{ r.Timestamp.Format("15:04:05.000") }</td>
+								<td>{ r.RequestID }</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</div>
+	}
+}
+
+func methodClass(method string) string {
+	switch method {
+	case "GET":
+		return "get"
+	case "POST":
+		return "post"
+	case "PUT":
+		return "put"
+	case "PATCH":
+		return "patch"
+	case "DELETE":
+		return "delete"
+	default:
+		return "get"
+	}
+}
+
+func statusBadge(status int) string {
+	switch {
+	case status >= 500:
+		return "5xx"
+	case status >= 400:
+		return "4xx"
+	case status >= 300:
+		return "3xx"
+	default:
+		return fmt.Sprintf("%d", status)
+	}
+}
+
+func latencyClass(ms float64) string {
+	switch {
+	case ms > 500:
+		return "latency-slow"
+	case ms > 100:
+		return "latency-medium"
+	default:
+		return "latency-fast"
+	}
+}
