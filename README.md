@@ -1,169 +1,146 @@
 <img src="https://cdn.slicesoft.dev/boat.svg" width="400" />
 
-# Keel Addon Template
-Keel is a Go framework for building REST APIs with modular 
-architecture, automatic OpenAPI, and built-in validation.
+# ss-keel-devpanel
 
-[![CI](https://github.com/slice-soft/ss-keel-core/actions/workflows/ci.yml/badge.svg)](https://github.com/slice-soft/ss-keel-core/actions)
+Observability dev panel for [Keel](https://keel-go.dev) applications.
+Provides a real-time UI to inspect requests, logs, addon events, routes, and configuration — all embedded in your Go binary.
+
+[![CI](https://github.com/slice-soft/ss-keel-devpanel/actions/workflows/ci.yml/badge.svg)](https://github.com/slice-soft/ss-keel-devpanel/actions)
 ![Go](https://img.shields.io/badge/Go-1.25+-00ADD8?logo=go&logoColor=white)
-[![Go Report Card](https://goreportcard.com/badge/github.com/slice-soft/ss-keel-core)](https://goreportcard.com/report/github.com/slice-soft/ss-keel-core)
-[![Go Reference](https://pkg.go.dev/badge/github.com/slice-soft/ss-keel-core.svg)](https://pkg.go.dev/github.com/slice-soft/ss-keel-core)
+[![Go Reference](https://pkg.go.dev/badge/github.com/slice-soft/ss-keel-devpanel.svg)](https://pkg.go.dev/github.com/slice-soft/ss-keel-devpanel)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Made in Colombia](https://img.shields.io/badge/Made%20in-Colombia-FCD116?labelColor=003893)
 
+---
 
-This repository is a **base template** for building **Keel Framework** addons.
-It helps developers and companies quickly create functional addons with CI/CD, testing, and automated releases.
-It also serves as a reference for the `keel-addon.json` contract used by the CLI to download and integrate addons into Keel projects.
+## Features
+
+- **Requests** — ring buffer (256 entries) with method, path, status, latency, request ID
+- **Logs** — ring buffer (512 entries) with level filter, search, and live SSE stream
+- **Addon events** — per-addon SSE stream from any `contracts.Debuggable` addon
+- **Routes** — registered Fiber routes at a glance
+- **Config** — env vars (secrets auto-redacted), Go runtime stats, addon manifests
+- **Guard** — `Enabled` flag + optional Bearer token; returns 404 when disabled
+- **Rate limiting** — 120 req/min per IP on all panel endpoints
+- **Header** — every panel response includes `X-Keel-Panel: true`
+- **Zero external deps** — htmx and CSS embedded via `//go:embed`
 
 ---
 
-## 🚀 Template structure
-
-```
-ss-keel-addon-template/
-├── .github/workflows/    # CI and release workflows (commented by default)
-│   ├── ci.yml
-│   └── release.yml
-├── .gitignore
-├── .release-please-manifest.json
-├── .release-please-config.json
-├── CONTRIBUTING.md       # Contribution guide
-├── keel-addon.json       # Addon contract for the CLI
-├── LICENSE
-├── README.md
-└── go.mod
-```
-
----
-
-## 🛠️ Create a new addon
-
-Recommended option (GitHub Template):
-
-1. Open this repository on GitHub.
-2. Click **Use this template**.
-3. Create your new repository from this template.
-4. Clone your new repository locally.
-
-Alternative option (manual clone):
+## Installation
 
 ```bash
-# Clone the template into a new project
-git clone https://github.com/slice-soft/ss-keel-addon-template.git my-addon
-cd my-addon
-
-# Delete the existing git history
-rm -rf .git
-
-# Initialize a new git repository
-git init
-
-# Update the Go module path
-go mod edit -module github.com/my-company/my-addon
-go mod tidy
+go get github.com/slice-soft/ss-keel-devpanel
 ```
-
-> `my-addon` is now ready to be developed and registered in Keel.
-
-Edit `keel-addon.json` with your addon's real values (`name`, `repo`, `version`, `steps`, etc.).
 
 ---
 
-## ⚡️ Keel integration
+## Quick start
 
-* Place your addon logic in `internal/addon`.
-* Define metadata in `keel-addon.json`. This file is the contract the Keel CLI validates to install and integrate the addon.
+```go
+import (
+    "github.com/gofiber/fiber/v2"
+    "github.com/slice-soft/ss-keel-devpanel/devpanel"
+)
 
-```json
-{
-  "name": "my-addon",
-  "version": "0.1.0",
-  "description": "Short addon description",
-  "register": true,
-  "repo": "github.com/your-user/your-repo",
-  "steps": [
-    {
-      "file": "cmd/main.go",
-      "action": "append",
-      "snippet": "// TODO: add addon initialization here",
-      "flags": []
-    }
-  ]
+func main() {
+    panel := devpanel.New(devpanel.Config{
+        Enabled: true,                   // set false in production
+        Secret:  os.Getenv("PANEL_SECRET"), // optional Bearer token
+        Path:    "/keel/panel",          // default path
+    })
+    defer panel.Shutdown()
+
+    app := fiber.New()
+
+    // Capture incoming requests (place before your routes).
+    app.Use(panel.RequestMiddleware())
+
+    // Optional: defence-in-depth guard at app level.
+    app.Use(panel.GlobalGuard())
+
+    // Mount the panel UI.
+    panel.Mount(app)
+
+    // Your application routes.
+    app.Get("/api/users", handleUsers)
+
+    app.Listen(":3000")
 }
 ```
 
-* The Keel CLI uses this file to:
-  * Resolve the module to download (`repo`).
-  * Validate that the addon matches the expected format.
-  * Execute `steps` to integrate changes automatically.
-  * Register the addon when applicable (`register`).
+Open `http://localhost:3000/keel/panel` in your browser.
 
 ---
 
-## 🧭 `keel add` flow in the ecosystem
+## Logger
 
-The CLI supports two installation paths:
+Use `PanelLogger` to associate logs with requests in the panel:
 
-1. **Official or verified addons**
+```go
+logger := panel.Logger()
 
-```bash
-keel add gorm
+app.Use(func(c *fiber.Ctx) error {
+    reqLogger := logger.WithRequestID(c.Get("X-Request-ID"))
+    c.Locals("logger", reqLogger)
+    return c.Next()
+})
+
+// In a handler:
+log := c.Locals("logger").(*devpanel.PanelLogger)
+log.Info("user fetched: %s", userID)
 ```
 
-* `gorm` is interpreted as an alias.
-* The CLI checks the `ss-keel-addons` alias repository.
-* If the alias exists, it gets the addon URL, downloads it, and validates its `keel-addon.json`.
-* Then it executes the defined `steps` to integrate it automatically into the project.
+---
 
-2. **Unofficial addons or addons not verified by SliceSoft/community**
+## Addon integration
 
-```bash
-keel add github.com/user/repo
+Any addon implementing `contracts.Debuggable` can self-register:
+
+```go
+func (a *MyAddon) Register(app *keel.App) error {
+    if panel, ok := app.GetAddon("devpanel").(contracts.PanelRegistry); ok {
+        panel.RegisterAddon(a)
+    }
+    return nil
+}
 ```
 
-* The CLI uses the provided repository directly.
-* It downloads the module and validates its `keel-addon.json`.
-* If validation passes, it applies the automatic integration steps the same way as official addons.
+Addons that also implement `contracts.Manifestable` expose version, capabilities, resources, and env vars on the Config page.
 
 ---
 
-## 📚 Alias library: `ss-keel-addons`
+## Configuration
 
-`ss-keel-addons` works as an alias catalog/library for addons.
+| Field     | Type   | Default        | Description                              |
+|-----------|--------|----------------|------------------------------------------|
+| `Enabled` | bool   | `false`        | Enable the panel. Set `false` in prod.   |
+| `Secret`  | string | `""`           | Bearer token. Empty = no auth required.  |
+| `Path`    | string | `/keel/panel`  | URL prefix for all panel routes.         |
 
-* Stores the relationship `alias -> repository URL`.
-* Lets the CLI verify whether an alias exists before installing.
-* Centralizes official or community-verified addons.
-* Acts as the entry point for pre-validation before the automatic download and integration process.
+Env vars declared in the panel's own manifest:
 
----
-
-## 🤚 CI/CD and releases
-
-This repository is a template, so workflows are intentionally shipped **commented out** to avoid accidental executions after cloning:
-
-* `.github/workflows/ci.yml`
-* `.github/workflows/release.yml`
-
-To enable CI/CD in your new addon repository:
-
-1. Uncomment both workflow files.
-2. Push to GitHub to validate that Actions run correctly.
+| Key                  | Secret | Default        |
+|----------------------|--------|----------------|
+| `KEEL_PANEL_ENABLED` | no     | `true`         |
+| `KEEL_PANEL_SECRET`  | yes    | *(empty)*      |
+| `KEEL_PANEL_PATH`    | no     | `/keel/panel`  |
 
 ---
 
-## 💡 Recommendations
+## Security
 
-* Keep your addons independent and modular.
-* Use Keel events and guards to extend functionality without touching the core.
-* Document each addon in its own project README.
+- **Always set `Enabled: false` in production** unless you intend to expose the panel.
+- Use `Secret` with a strong random token and HTTPS when exposing the panel.
+- `GlobalGuard()` provides an extra layer at the app middleware level (defence in depth).
+- Secret env var values are automatically redacted (`••••••••`) on the Config page.
+- Addon event `Detail` fields are displayed as-is — addons must not put sensitive data in events.
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup and repository-specific rules.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for local setup.
 The base workflow, commit conventions, and community standards live in [ss-community](https://github.com/slice-soft/ss-community/blob/main/CONTRIBUTING.md).
 
 ## Community
@@ -175,18 +152,17 @@ The base workflow, commit conventions, and community standards live in [ss-commu
 | [CODE_OF_CONDUCT.md](https://github.com/slice-soft/ss-community/blob/main/CODE_OF_CONDUCT.md) | Community standards |
 | [VERSIONING.md](https://github.com/slice-soft/ss-community/blob/main/VERSIONING.md) | SemVer policy and breaking changes |
 | [SECURITY.md](https://github.com/slice-soft/ss-community/blob/main/SECURITY.md) | How to report vulnerabilities |
-| [MAINTAINERS.md](https://github.com/slice-soft/ss-community/blob/main/MAINTAINERS.md) | Active maintainers |
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ## Links
 
 - Website: [keel-go.dev](https://keel-go.dev)
-- GitHub: [github.com/slice-soft/ss-keel-cli](https://github.com/slice-soft/ss-keel-cli)
 - Documentation: [docs.keel-go.dev](https://docs.keel-go.dev)
+- GitHub: [github.com/slice-soft/ss-keel-devpanel](https://github.com/slice-soft/ss-keel-devpanel)
 
 ---
 
-Made by [SliceSoft](https://slicesoft.dev) — Colombia 💙
+Made by [SliceSoft](https://slicesoft.dev) — Colombia

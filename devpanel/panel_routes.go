@@ -4,10 +4,12 @@ import (
 	"embed"
 	"io/fs"
 	"net/http"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/slice-soft/ss-keel-devpanel/devpanel/ui"
 )
 
@@ -21,6 +23,12 @@ var assetsFS embed.FS
 //	panel.Mount(app.Fiber())
 func (p *DevPanel) Mount(router *fiber.App) {
 	g := router.Group(p.cfg.Path, p.guard())
+
+	// Rate limiter — 120 requests per minute per IP for panel endpoints.
+	g.Use(limiter.New(limiter.Config{
+		Max:        120,
+		Expiration: 1 * time.Minute,
+	}))
 
 	// Static assets — served under <path>/assets/
 	sub, _ := fs.Sub(assetsFS, "assets")
