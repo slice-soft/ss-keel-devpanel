@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.7.0...v1.7.1) (2026-03-25)
+
+
+### Bug Fixes
+
+* Update ss-keel-core dependency to v0.10.0 in go.mod and go.sum ([#18](https://github.com/slice-soft/ss-keel-devpanel/issues/18)) ([7688a1f](https://github.com/slice-soft/ss-keel-devpanel/commit/7688a1f7f751f85ac5cf623107010a83a8b25a85))
+
 ## [1.7.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.6.0...v1.7.0) (2026-03-25)
 
 
