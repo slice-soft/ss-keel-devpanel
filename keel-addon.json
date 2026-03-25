@@ -1,0 +1,21 @@
+{
+  "name": "my-addon",
+  "version": "0.1.0",
+  "description": "Description of my addon",
+  "register": true,
+  "repo": "github.com/your-user/your-repo",
+  "steps": [
+    {
+      "file": "cmd/main.go",
+      "action": "append",
+      "snippet": "// TODO: add addon initialization here",
+      "flags": []
+    },
+    {
+      "file": "config/config.go",
+      "action": "append",
+      "snippet": "// TODO: add addon configuration here",
+      "flags": []
+    }
+  ]
+}
