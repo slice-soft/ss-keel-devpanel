@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.6.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.5.0...v1.6.0) (2026-03-25)
+
+
+### Features
+
+* **devpanel:** implement rate limiting and enhance guard middleware ([ccb198e](https://github.com/slice-soft/ss-keel-devpanel/commit/ccb198e158a39dda7b3aa35735ec873df7794660))
+* **docs:** update CONTRIBUTING.md and README.md for clarity and structure ([#14](https://github.com/slice-soft/ss-keel-devpanel/issues/14)) ([ccb198e](https://github.com/slice-soft/ss-keel-devpanel/commit/ccb198e158a39dda7b3aa35735ec873df7794660))
+
+
+### Bug Fixes
+
+* **devpanel:** bump version to 1.0.0 in manifest ([ccb198e](https://github.com/slice-soft/ss-keel-devpanel/commit/ccb198e158a39dda7b3aa35735ec873df7794660))
+
 ## [1.5.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.4.0...v1.5.0) (2026-03-25)
 
 
