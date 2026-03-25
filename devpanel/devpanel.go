@@ -20,6 +20,7 @@ type DevPanel struct {
 	mu       sync.RWMutex
 	addons   []contracts.Debuggable
 	requests *requestBuffer
+	logs     *logBuffer
 }
 
 // Compile-time assertions.
@@ -32,7 +33,22 @@ var (
 // New creates a new DevPanel with the given configuration.
 func New(cfg Config) *DevPanel {
 	cfg.setDefaults()
-	return &DevPanel{cfg: cfg}
+	return &DevPanel{
+		cfg:  cfg,
+		logs: newLogBuffer(logBufferSize),
+	}
+}
+
+// Logger returns the panel's PanelLogger, which implements contracts.Logger.
+// Use Logger().WithRequestID(id) inside request handlers to associate log
+// entries with a specific request.
+func (p *DevPanel) Logger() *PanelLogger {
+	return &PanelLogger{buf: p.logs}
+}
+
+// Logs returns a snapshot of captured log entries, oldest first.
+func (p *DevPanel) Logs() []LogEntry {
+	return p.logs.snapshot()
 }
 
 // ID returns the unique identifier for this addon.
