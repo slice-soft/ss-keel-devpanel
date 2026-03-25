@@ -2,12 +2,14 @@ module github.com/slice-soft/ss-keel-devpanel
 
 go 1.25.0
 
-require github.com/slice-soft/ss-keel-core v0.9.0
+require (
+	github.com/gofiber/fiber/v2 v2.52.0
+	github.com/google/uuid v1.5.0
+	github.com/slice-soft/ss-keel-core v0.9.0
+)
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/gofiber/fiber/v2 v2.52.0 // indirect
-	github.com/google/uuid v1.5.0 // indirect
 	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
