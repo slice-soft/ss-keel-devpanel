@@ -21,6 +21,7 @@ type DevPanel struct {
 	addons   []contracts.Debuggable
 	requests *requestBuffer
 	logs     *logBuffer
+	logBcast *sseBroadcaster[LogEntry]
 }
 
 // Compile-time assertions.
@@ -34,8 +35,9 @@ var (
 func New(cfg Config) *DevPanel {
 	cfg.setDefaults()
 	return &DevPanel{
-		cfg:  cfg,
-		logs: newLogBuffer(logBufferSize),
+		cfg:      cfg,
+		logs:     newLogBuffer(logBufferSize),
+		logBcast: newSSEBroadcaster[LogEntry](),
 	}
 }
 
@@ -43,7 +45,7 @@ func New(cfg Config) *DevPanel {
 // Use Logger().WithRequestID(id) inside request handlers to associate log
 // entries with a specific request.
 func (p *DevPanel) Logger() *PanelLogger {
-	return &PanelLogger{buf: p.logs}
+	return &PanelLogger{buf: p.logs, bcast: p.logBcast}
 }
 
 // Logs returns a snapshot of captured log entries, oldest first.

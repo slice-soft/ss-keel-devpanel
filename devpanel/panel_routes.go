@@ -33,6 +33,8 @@ func (p *DevPanel) Mount(router *fiber.App) {
 		return c.Redirect(p.cfg.Path + "/requests")
 	})
 	g.Get("/requests", p.handleRequests())
+	g.Get("/logs", p.handleLogs())
+	g.Get("/logs/stream", p.handleLogsStream())
 	g.Get("/routes", p.handleRoutes())
 	g.Get("/addons", p.handleAddons())
 }
