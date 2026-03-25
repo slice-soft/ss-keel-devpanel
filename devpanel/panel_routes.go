@@ -39,6 +39,7 @@ func (p *DevPanel) Mount(router *fiber.App) {
 	g.Get("/addons", p.handleAddons())
 	g.Get("/addons/:id", p.handleAddonDetail())
 	g.Get("/addons/:id/stream", p.handleAddonStream())
+	g.Get("/config", p.handleConfig())
 }
 
 // render writes a templ component to the Fiber response.

@@ -1,0 +1,135 @@
+package ui
+
+import "fmt"
+
+// EnvVarRow is the view model for a single env var in the config page.
+type EnvVarRow struct {
+	Key         string
+	Value       string // redacted if secret
+	Source      string
+	Required    bool
+	Secret      bool
+	Description string
+}
+
+// RuntimeInfo holds Go runtime statistics for display.
+type RuntimeInfo struct {
+	GoVersion  string
+	Goroutines int
+	HeapAllocMB float64
+	SysMB       float64
+}
+
+// ConfigAddonRow is the view model for an addon in the config page.
+type ConfigAddonRow struct {
+	ID           string
+	Version      string
+	Capabilities []string
+	Resources    []string
+}
+
+templ Config(nav []NavItem, envVars []EnvVarRow, runtime RuntimeInfo, addons []ConfigAddonRow) {
+	@Layout("Config", nav) {
+		<div class="topbar">
+			<h1>Config</h1>
+		</div>
+		<div class="content">
+			<!-- Runtime -->
+			<h2 style="font-size:13px;font-weight:600;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Runtime</h2>
+			<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;">
+				@statCard("Go version", runtime.GoVersion)
+				@statCard("Goroutines", itoa(runtime.Goroutines))
+				@statCard("Heap alloc", fmtMB(runtime.HeapAllocMB))
+				@statCard("Sys memory", fmtMB(runtime.SysMB))
+			</div>
+			<!-- Addons -->
+			if len(addons) > 0 {
+				<h2 style="font-size:13px;font-weight:600;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Addons</h2>
+				<table style="margin-bottom:28px;">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Version</th>
+							<th>Capabilities</th>
+							<th>Resources</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, a := range addons {
+							<tr>
+								<td>{ a.ID }</td>
+								<td>{ a.Version }</td>
+								<td>
+									for _, cap := range a.Capabilities {
+										<span class="badge badge-blue" style="margin-right:4px;">{ cap }</span>
+									}
+								</td>
+								<td>
+									for _, res := range a.Resources {
+										<span class="badge badge-gray" style="margin-right:4px;">{ res }</span>
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+			<!-- Env vars -->
+			<h2 style="font-size:13px;font-weight:600;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Environment Variables</h2>
+			if len(envVars) == 0 {
+				<div class="empty">
+					<strong>No env vars declared</strong>
+					<p>Env vars declared in addon manifests will appear here.</p>
+				</div>
+			} else {
+				<table>
+					<thead>
+						<tr>
+							<th>Key</th>
+							<th>Value</th>
+							<th>Source</th>
+							<th>Required</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, v := range envVars {
+							<tr>
+								<td>{ v.Key }</td>
+								<td>
+									if v.Secret {
+										<span style="color:var(--fg-muted);font-style:italic;">{ v.Value }</span>
+									} else {
+										{ v.Value }
+									}
+								</td>
+								<td><span class="badge badge-gray">{ v.Source }</span></td>
+								<td>
+									if v.Required {
+										<span class="badge badge-red">required</span>
+									} else {
+										<span style="color:var(--fg-muted);">optional</span>
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</div>
+	}
+}
+
+templ statCard(label, value string) {
+	<div class="card" style="text-align:center;">
+		<div style="font-size:20px;font-weight:700;margin-bottom:4px;">{ value }</div>
+		<div style="font-size:11px;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.04em;">{ label }</div>
+	</div>
+}
+
+func itoa(n int) string {
+	return fmt.Sprintf("%d", n)
+}
+
+func fmtMB(mb float64) string {
+	return fmt.Sprintf("%.1f MB", mb)
+}
