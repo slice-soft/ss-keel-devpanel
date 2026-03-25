@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.8.0...v1.9.0) (2026-03-25)
+
+
+### Features
+
+* enhance configuration management with new properties and update dependencies ([#22](https://github.com/slice-soft/ss-keel-devpanel/issues/22)) ([38d249b](https://github.com/slice-soft/ss-keel-devpanel/commit/38d249b4f52fa482038d7ea7cdb5661408f60e12))
+
 ## [1.8.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.7.1...v1.8.0) (2026-03-25)
 
 
