@@ -7,6 +7,7 @@ Provides a real-time UI to inspect requests, logs, addon events, routes, and con
 
 [![CI](https://github.com/slice-soft/ss-keel-devpanel/actions/workflows/ci.yml/badge.svg)](https://github.com/slice-soft/ss-keel-devpanel/actions)
 ![Go](https://img.shields.io/badge/Go-1.25+-00ADD8?logo=go&logoColor=white)
+[![Go Report Card](https://goreportcard.com/badge/github.com/slice-soft/ss-keel-devpanel)](https://goreportcard.com/report/github.com/slice-soft/ss-keel-devpanel)
 [![Go Reference](https://pkg.go.dev/badge/github.com/slice-soft/ss-keel-devpanel.svg)](https://pkg.go.dev/github.com/slice-soft/ss-keel-devpanel)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Made in Colombia](https://img.shields.io/badge/Made%20in-Colombia-FCD116?labelColor=003893)
@@ -27,7 +28,19 @@ Provides a real-time UI to inspect requests, logs, addon events, routes, and con
 
 ---
 
-## Installation
+## 🚀 Installation
+
+```bash
+keel add devpanel
+```
+
+The CLI will:
+- Add `ss-keel-devpanel` to your Go module
+- Create `cmd/setup_devpanel.go` with the initialization function
+- Inject one line into `cmd/main.go` before your modules are registered
+- Add `KEEL_PANEL_ENABLED`, `KEEL_PANEL_SECRET`, and `KEEL_PANEL_PATH` to `.env`
+
+Or manually:
 
 ```bash
 go get github.com/slice-soft/ss-keel-devpanel
@@ -135,6 +148,20 @@ Env vars declared in the panel's own manifest:
 - `GlobalGuard()` provides an extra layer at the app middleware level (defence in depth).
 - Secret env var values are automatically redacted (`••••••••`) on the Config page.
 - Addon event `Detail` fields are displayed as-is — addons must not put sensitive data in events.
+
+---
+
+## 🤚 CI/CD and releases
+
+Every PR runs `go test -race ./...` and `go vet ./...` via the reusable pipeline in `ss-pipeline`. Releases are created automatically by `release-please` on every merge to `main`.
+
+---
+
+## 💡 Recommendations
+
+- **Disable in production** — set `KEEL_PANEL_ENABLED=false` or `Enabled: false` in all production environments.
+- **Protect with a secret** — set `KEEL_PANEL_SECRET` to a strong random token and serve the app over HTTPS whenever the panel is enabled.
+- **Register your addons** — any addon implementing `contracts.Debuggable` can self-register with the panel to stream live events; addons implementing `contracts.Manifestable` also appear in the Config tab.
 
 ---
 
