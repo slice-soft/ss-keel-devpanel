@@ -128,7 +128,7 @@ Addons that also implement `contracts.Manifestable` expose version, capabilities
 
 | Field     | Type   | Default        | Description                              |
 |-----------|--------|----------------|------------------------------------------|
-| `Enabled` | bool   | `false`        | Enable the panel. Set `false` in prod.   |
+| `Enabled` | bool   | `true`         | Enable the panel. Set `false` in prod.   |
 | `Secret`  | string | `""`           | Bearer token. Empty = no auth required.  |
 | `Path`    | string | `/keel/panel`  | URL prefix for all panel routes.         |
 
