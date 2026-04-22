@@ -10,5 +10,7 @@ permissions:
 
 jobs:
   release-go-library:
-    uses: slice-soft/ss-pipeline/.github/workflows/create-release.yml@v0
+    uses: slice-soft/ss-pipeline/.github/workflows/release-go-library.yml@v0
+    with:
+      module: github.com/slice-soft/ss-keel-devpanel
     secrets: inherit
