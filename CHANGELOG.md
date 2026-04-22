@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.9.0...v1.10.0) (2026-04-22)
+
+
+### Features
+
+* update keel-addon.json to include environment variables for panel configuration ([#25](https://github.com/slice-soft/ss-keel-devpanel/issues/25)) ([f815e89](https://github.com/slice-soft/ss-keel-devpanel/commit/f815e89b60d3fa7814e9bab88793c192aec3fb1b))
+
 ## [1.9.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.8.0...v1.9.0) (2026-03-25)
 
 
