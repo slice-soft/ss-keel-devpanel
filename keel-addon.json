@@ -1,60 +1,63 @@
 {
-  "name": "ss-keel-devpanel",
-  "version": "0.1.0",
-  "description": "Real-time observability UI for Keel applications — requests, logs, addon events and config",
-  "repo": "github.com/slice-soft/ss-keel-devpanel",
-  "steps": [
-    {
-      "type": "go_get",
-      "package": "github.com/slice-soft/ss-keel-devpanel"
-    },
-    {
-      "type": "property",
-      "key": "panel.enabled",
-      "example": "${KEEL_PANEL_ENABLED:true}",
-      "description": "Enable or disable the dev panel."
-    },
-    {
-      "type": "property",
-      "key": "panel.secret",
-      "example": "${KEEL_PANEL_SECRET:}",
-      "description": "Optional bearer token used to protect panel routes."
-    },
-    {
-      "type": "property",
-      "key": "panel.path",
-      "example": "${KEEL_PANEL_PATH:/keel/panel}",
-      "description": "URL prefix for all panel routes."
-    },
-    {
-      "type": "env",
-      "key": "KEEL_PANEL_ENABLED",
-      "example": "true",
-      "description": "Enable the dev panel UI. Set to false in production."
-    },
-    {
-      "type": "env",
-      "key": "KEEL_PANEL_SECRET",
-      "example": "",
-      "description": "Bearer token required to access the panel. Leave empty to disable auth."
-    },
-    {
-      "type": "env",
-      "key": "KEEL_PANEL_PATH",
-      "example": "/keel/panel",
-      "description": "URL prefix for all panel routes."
-    },
-    {
-      "type": "create_provider_file",
-      "filename": "cmd/setup_devpanel.go",
-      "guard": "func setupDevPanel(",
-      "content": "package main\n\nimport (\n\t\"github.com/slice-soft/ss-keel-core/config\"\n\t\"github.com/slice-soft/ss-keel-core/core\"\n\t\"github.com/slice-soft/ss-keel-devpanel/devpanel\"\n)\n\n// setupDevPanel mounts the real-time observability panel on the Fiber app.\n// Set panel.enabled=false in production to disable the panel.\nfunc setupDevPanel(app *core.App) *devpanel.DevPanel {\n\tpanelConfig := config.MustLoadConfig[devpanel.Config]()\n\tpanel := devpanel.New(panelConfig)\n\tfiberApp := app.Fiber()\n\tfiberApp.Use(panel.RequestMiddleware())\n\tfiberApp.Use(panel.GlobalGuard())\n\tpanel.Mount(fiberApp)\n\treturn panel\n}\n"
-    },
-    {
-      "type": "main_code",
-      "anchor": "before_modules",
-      "guard": "setupDevPanel(",
-      "code": "panel := setupDevPanel(app)\ndefer panel.Shutdown()"
-    }
-  ]
+    "name": "ss-keel-devpanel",
+    "version": "0.1.0",
+    "description": "Real-time observability UI for Keel applications — requests, logs, addon events and config",
+    "repo": "github.com/slice-soft/ss-keel-devpanel",
+    "capabilities": [
+        "observability"
+    ],
+    "steps": [
+        {
+            "type": "go_get",
+            "package": "github.com/slice-soft/ss-keel-devpanel"
+        },
+        {
+            "type": "property",
+            "key": "panel.enabled",
+            "example": "${KEEL_PANEL_ENABLED:true}",
+            "description": "Enable or disable the dev panel."
+        },
+        {
+            "type": "property",
+            "key": "panel.secret",
+            "example": "${KEEL_PANEL_SECRET:}",
+            "description": "Optional bearer token used to protect panel routes."
+        },
+        {
+            "type": "property",
+            "key": "panel.path",
+            "example": "${KEEL_PANEL_PATH:/keel/panel}",
+            "description": "URL prefix for all panel routes."
+        },
+        {
+            "type": "env",
+            "key": "KEEL_PANEL_ENABLED",
+            "example": "true",
+            "description": "Enable the dev panel UI. Set to false in production."
+        },
+        {
+            "type": "env",
+            "key": "KEEL_PANEL_SECRET",
+            "example": "",
+            "description": "Bearer token required to access the panel. Leave empty to disable auth."
+        },
+        {
+            "type": "env",
+            "key": "KEEL_PANEL_PATH",
+            "example": "/keel/panel",
+            "description": "URL prefix for all panel routes."
+        },
+        {
+            "type": "create_provider_file",
+            "filename": "cmd/setup_devpanel.go",
+            "guard": "func setupDevPanel(",
+            "content": "package main\n\nimport (\n\t\"github.com/slice-soft/ss-keel-core/config\"\n\t\"github.com/slice-soft/ss-keel-core/core\"\n\t\"github.com/slice-soft/ss-keel-devpanel/devpanel\"\n)\n\n// setupDevPanel mounts the real-time observability panel on the Fiber app.\n// Set panel.enabled=false in production to disable the panel.\nfunc setupDevPanel(app *core.App) *devpanel.DevPanel {\n\tpanelConfig := config.MustLoadConfig[devpanel.Config]()\n\tpanel := devpanel.New(panelConfig)\n\tfiberApp := app.Fiber()\n\tfiberApp.Use(panel.RequestMiddleware())\n\tfiberApp.Use(panel.GlobalGuard())\n\tpanel.Mount(fiberApp)\n\treturn panel\n}\n"
+        },
+        {
+            "type": "main_code",
+            "anchor": "before_modules",
+            "guard": "setupDevPanel(",
+            "code": "panel := setupDevPanel(app)\ndefer panel.Shutdown()"
+        }
+    ]
 }
