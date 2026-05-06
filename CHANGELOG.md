@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.10.0...v1.11.0) (2026-05-06)
+
+
+### Features
+
+* enhance request middleware and logging ([#28](https://github.com/slice-soft/ss-keel-devpanel/issues/28)) ([02200f3](https://github.com/slice-soft/ss-keel-devpanel/commit/02200f3182baeeed14512de53f135ee7cb38281c))
+
 ## [1.10.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.9.0...v1.10.0) (2026-04-22)
 
 
