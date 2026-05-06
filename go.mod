@@ -6,7 +6,7 @@ require (
 	github.com/a-h/templ v0.3.1001
 	github.com/gofiber/fiber/v2 v2.52.0
 	github.com/google/uuid v1.5.0
-	github.com/slice-soft/ss-keel-core v0.11.0
+	github.com/slice-soft/ss-keel-core v0.12.0
 )
 
 require (
