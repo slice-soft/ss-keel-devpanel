@@ -4,6 +4,7 @@ import (
 	"embed"
 	"io/fs"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/a-h/templ"
@@ -22,6 +23,7 @@ var assetsFS embed.FS
 //	panel := devpanel.New(cfg)
 //	panel.Mount(app.Fiber())
 func (p *DevPanel) Mount(router *fiber.App) {
+	p.fiberApp = router
 	g := router.Group(p.cfg.Path, p.guard())
 
 	// Rate limiter — 120 requests per minute per IP for panel endpoints.
@@ -93,7 +95,19 @@ func (p *DevPanel) handleRequests() fiber.Handler {
 
 func (p *DevPanel) handleRoutes() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return render(c, ui.Routes(p.buildNav("Routes"), nil))
+		var rows []ui.RouteRow
+		if p.fiberApp != nil {
+			for _, r := range p.fiberApp.GetRoutes(true) {
+				if strings.HasPrefix(r.Path, p.cfg.Path) {
+					continue
+				}
+				rows = append(rows, ui.RouteRow{
+					Method: r.Method,
+					Path:   r.Path,
+				})
+			}
+		}
+		return render(c, ui.Routes(p.buildNav("Routes"), rows))
 	}
 }
 

@@ -44,6 +44,11 @@ func (p *DevPanel) handleLogsStream() fiber.Handler {
 		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			defer cancel()
 
+			// Force header flush so EventSource.onopen fires immediately,
+			// even when the log buffer is empty (SSE comment is ignored by clients).
+			_, _ = fmt.Fprint(w, ": ping\n\n")
+			_ = w.Flush()
+
 			// Send existing snapshot so the client is up-to-date on connect.
 			for _, entry := range p.Logs() {
 				if err := writeLogEvent(w, entry); err != nil {
