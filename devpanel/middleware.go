@@ -27,7 +27,7 @@ func (p *DevPanel) RequestMiddleware() fiber.Handler {
 		// Skip panel's own routes and the parent group prefix (Fiber generates
 		// an internal redirect from /keel/ → /keel/panel before mounting).
 		panelBase := strings.TrimSuffix(p.cfg.Path, "/")
-		if strings.HasPrefix(path, panelBase) {
+		if path == panelBase || strings.HasPrefix(path, panelBase+"/") {
 			return c.Next()
 		}
 		if idx := strings.LastIndex(panelBase, "/"); idx > 0 {
