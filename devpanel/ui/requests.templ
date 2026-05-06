@@ -43,7 +43,7 @@ templ Requests(nav []NavItem, rows []RequestRow) {
 						for _, r := range rows {
 							<tr>
 								<td><span class={ "method-" + methodClass(r.Method) }>{ r.Method }</span></td>
-								<td>{ r.Path }</td>
+								<td title={ r.Path }>{ r.Path }</td>
 								<td>{ statusBadge(r.Status) }</td>
 								<td class={ latencyClass(r.LatencyMS) }>{ fmt.Sprintf("%.1fms", r.LatencyMS) }</td>
 								<td>{ r.Timestamp.Format("15:04:05.000") }</td>

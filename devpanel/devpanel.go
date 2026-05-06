@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/slice-soft/ss-keel-core/contracts"
 )
 
@@ -19,6 +20,7 @@ import (
 type DevPanel struct {
 	cfg      Config
 	mu       sync.RWMutex
+	fiberApp *fiber.App
 	addons   []contracts.Debuggable
 	streams  map[string]*addonStream // keyed by PanelID
 	requests *requestBuffer

@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/slice-soft/ss-keel-devpanel/devpanel"
+	keelcore "github.com/slice-soft/ss-keel-core/core"
 )
 
 // --- ring buffer tests ---
@@ -116,6 +117,57 @@ func TestRequestBuffer_ringOverwrite(t *testing.T) {
 	entries := p.Requests()
 	if len(entries) != 256 {
 		t.Fatalf("expected 256 entries (buffer cap), got %d", len(entries))
+	}
+}
+
+func TestRequestBuffer_capturesKErrorStatus(t *testing.T) {
+	p := devpanel.New(devpanel.Config{Enabled: true})
+	app := fiber.New()
+	app.Use(p.RequestMiddleware())
+	app.Get("/items/:id", func(c *fiber.Ctx) error {
+		return keelcore.NotFound("item not found")
+	})
+
+	req := httptest.NewRequest("GET", "/items/999", nil)
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
+
+	entries := p.Requests()
+	if len(entries) != 1 {
+		t.Fatalf("expected 1 entry, got %d", len(entries))
+	}
+	if entries[0].Status != 404 {
+		t.Fatalf("Status = %d, want 404; middleware must read KError.StatusCode, not c.Response().StatusCode()", entries[0].Status)
+	}
+}
+
+func TestRequestBuffer_ignoresParentGroupPrefix(t *testing.T) {
+	p := devpanel.New(devpanel.Config{Enabled: true, Path: "/keel/panel"})
+	app := fiber.New()
+	app.Use(p.RequestMiddleware())
+	app.Get("/keel/", func(c *fiber.Ctx) error { return c.SendStatus(200) })
+	app.Get("/api/ping", func(c *fiber.Ctx) error { return c.SendStatus(200) })
+
+	for _, path := range []string{"/keel/", "/api/ping"} {
+		req := httptest.NewRequest("GET", path, nil)
+		resp, err := app.Test(req)
+		if err != nil {
+			t.Fatalf("app.Test(%s): %v", path, err)
+		}
+		io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+	}
+
+	entries := p.Requests()
+	if len(entries) != 1 {
+		t.Fatalf("expected 1 entry (only /api/ping), got %d", len(entries))
+	}
+	if entries[0].Path != "/api/ping" {
+		t.Fatalf("Path = %q, want /api/ping", entries[0].Path)
 	}
 }
 

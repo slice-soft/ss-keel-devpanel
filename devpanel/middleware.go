@@ -1,11 +1,13 @@
 package devpanel
 
 import (
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	keelcore "github.com/slice-soft/ss-keel-core/core"
 )
 
 const requestBufferSize = 256
@@ -22,9 +24,17 @@ func (p *DevPanel) RequestMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		path := c.Path()
 
-		// Skip panel's own routes.
-		if strings.HasPrefix(path, p.cfg.Path) {
+		// Skip panel's own routes and the parent group prefix (Fiber generates
+		// an internal redirect from /keel/ → /keel/panel before mounting).
+		panelBase := strings.TrimSuffix(p.cfg.Path, "/")
+		if strings.HasPrefix(path, panelBase) {
 			return c.Next()
+		}
+		if idx := strings.LastIndex(panelBase, "/"); idx > 0 {
+			groupBase := panelBase[:idx+1]
+			if path == groupBase || path == panelBase[:idx] {
+				return c.Next()
+			}
 		}
 
 		start := time.Now()
@@ -41,13 +51,29 @@ func (p *DevPanel) RequestMiddleware() fiber.Handler {
 			Timestamp: start,
 			Method:    c.Method(),
 			Path:      path,
-			Status:    c.Response().StatusCode(),
+			Status:    resolveStatus(c, err),
 			Latency:   latency,
 			RequestID: requestID,
 		})
 
 		return err
 	}
+}
+
+// resolveStatus returns the true HTTP status code for the request.
+// c.Response().StatusCode() reads 200 before Fiber's error handler runs,
+// so we inspect the returned error directly when one is present.
+func resolveStatus(c *fiber.Ctx, err error) int {
+	if err != nil {
+		var ke *keelcore.KError
+		if errors.As(err, &ke) {
+			return ke.StatusCode
+		}
+		if fe, ok := err.(*fiber.Error); ok {
+			return fe.Code
+		}
+	}
+	return c.Response().StatusCode()
 }
 
 // Requests returns a snapshot of captured requests, oldest first.
