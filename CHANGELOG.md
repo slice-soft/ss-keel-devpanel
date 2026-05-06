@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.1](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.11.0...v1.11.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* improve path check in RequestMiddleware to handle exact matches ([#31](https://github.com/slice-soft/ss-keel-devpanel/issues/31)) ([c40a48a](https://github.com/slice-soft/ss-keel-devpanel/commit/c40a48a50922b167870cb6f0aaa12f5953fa4e5b))
+
 ## [1.11.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.10.0...v1.11.0) (2026-05-06)
 
 
