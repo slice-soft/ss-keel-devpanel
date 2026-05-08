@@ -16,8 +16,8 @@ type RequestRow struct {
 	RequestID string
 }
 
-templ Requests(nav []NavItem, rows []RequestRow) {
-	@Layout("Requests", nav) {
+templ Requests(nav []NavItem, rows []RequestRow, assetBase string) {
+	@Layout("Requests", nav, assetBase) {
 		<div class="topbar">
 			<h1>Requests</h1>
 		</div>

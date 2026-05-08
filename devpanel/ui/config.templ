@@ -28,8 +28,8 @@ type ConfigAddonRow struct {
 	Resources    []string
 }
 
-templ Config(nav []NavItem, envVars []EnvVarRow, runtime RuntimeInfo, addons []ConfigAddonRow) {
-	@Layout("Config", nav) {
+templ Config(nav []NavItem, envVars []EnvVarRow, runtime RuntimeInfo, addons []ConfigAddonRow, assetBase string) {
+	@Layout("Config", nav, assetBase) {
 		<div class="topbar">
 			<h1>Config</h1>
 		</div>

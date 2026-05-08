@@ -7,15 +7,15 @@ type NavItem struct {
 	Active bool
 }
 
-templ Layout(title string, nav []NavItem) {
+templ Layout(title string, nav []NavItem, assetBase string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title } · Keel DevPanel</title>
-			<link rel="stylesheet" href="assets/panel.css"/>
-			<script src="assets/htmx.min.js" defer></script>
+			<link rel="stylesheet" href={ templ.SafeURL(assetBase + "/panel.css") }/>
+			<script src={ templ.SafeURL(assetBase + "/htmx.min.js") } defer></script>
 		</head>
 		<body>
 			<aside class="sidebar">

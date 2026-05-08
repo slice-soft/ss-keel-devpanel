@@ -6,8 +6,8 @@ type RouteRow struct {
 	Path   string
 }
 
-templ Routes(nav []NavItem, rows []RouteRow) {
-	@Layout("Routes", nav) {
+templ Routes(nav []NavItem, rows []RouteRow, assetBase string) {
+	@Layout("Routes", nav, assetBase) {
 		<div class="topbar">
 			<h1>Routes</h1>
 		</div>

@@ -7,8 +7,8 @@ type AddonEventRow struct {
 	Detail map[string]string // flattened for display
 }
 
-templ AddonDetail(nav []NavItem, addon AddonRow, streamURL string) {
-	@Layout(addon.Label + " Events", nav) {
+templ AddonDetail(nav []NavItem, addon AddonRow, streamURL string, assetBase string) {
+	@Layout(addon.Label+" Events", nav, assetBase) {
 		<div class="topbar">
 			<h1>{ addon.Label }</h1>
 			<div style="display:flex;gap:6px;align-items:center;">

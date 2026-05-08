@@ -63,6 +63,16 @@ func (p *DevPanel) Logger() *PanelLogger {
 	return &PanelLogger{buf: p.logs, bcast: p.logBcast}
 }
 
+// WrapLogger returns a contracts.Logger that writes every call to both l and
+// the DevPanel log buffer. Use it to make all application log lines visible
+// in the DevPanel Logs tab without changing your existing logger variable:
+//
+//	appLog := panel.WrapLogger(appLogger)
+//	db := setupGorm(app, appLog)
+func (p *DevPanel) WrapLogger(l contracts.Logger) contracts.Logger {
+	return &panelTee{app: l, panel: p.Logger()}
+}
+
 // Logs returns a snapshot of captured log entries, oldest first.
 func (p *DevPanel) Logs() []LogEntry {
 	return p.logs.snapshot()

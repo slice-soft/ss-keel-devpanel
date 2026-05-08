@@ -23,7 +23,7 @@ func (p *DevPanel) handleLogs() fiber.Handler {
 			}
 		}
 		streamURL := p.cfg.Path + "/logs/stream"
-		return render(c, ui.Logs(p.buildNav("Logs"), rows, streamURL))
+		return render(c, ui.Logs(p.buildNav("Logs"), rows, streamURL, p.assetBase()))
 	}
 }
 

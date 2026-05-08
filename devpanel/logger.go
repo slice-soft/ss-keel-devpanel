@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/slice-soft/ss-keel-core/contracts"
 )
 
 const logBufferSize = 512
@@ -104,3 +106,30 @@ func (l *PanelLogger) Debug(format string, args ...interface{}) { l.log(LogLevel
 func (l *PanelLogger) Info(format string, args ...interface{})  { l.log(LogLevelInfo, format, args...) }
 func (l *PanelLogger) Warn(format string, args ...interface{})  { l.log(LogLevelWarn, format, args...) }
 func (l *PanelLogger) Error(format string, args ...interface{}) { l.log(LogLevelError, format, args...) }
+
+// panelTee fans every log call out to both an app logger and the panel buffer.
+// Error writes the panel entry first so it is captured before the app logger
+// may call os.Exit.
+type panelTee struct {
+	app   contracts.Logger
+	panel *PanelLogger
+}
+
+var _ contracts.Logger = (*panelTee)(nil)
+
+func (t *panelTee) Debug(f string, args ...any) {
+	t.app.Debug(f, args...)
+	t.panel.Debug(f, args...)
+}
+func (t *panelTee) Info(f string, args ...any) {
+	t.app.Info(f, args...)
+	t.panel.Info(f, args...)
+}
+func (t *panelTee) Warn(f string, args ...any) {
+	t.app.Warn(f, args...)
+	t.panel.Warn(f, args...)
+}
+func (t *panelTee) Error(f string, args ...any) {
+	t.panel.Error(f, args...)
+	t.app.Error(f, args...) // app logger may call os.Exit
+}
