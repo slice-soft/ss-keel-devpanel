@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.11.1...v1.12.0) (2026-05-08)
+
+
+### Features
+
+* enhance DevPanel with asset base support and event replay for SSE clients ([#33](https://github.com/slice-soft/ss-keel-devpanel/issues/33)) ([6922353](https://github.com/slice-soft/ss-keel-devpanel/commit/6922353b2a2026c7dedb733801206c64f88bcdb3))
+
 ## [1.11.1](https://github.com/slice-soft/ss-keel-devpanel/compare/v1.11.0...v1.11.1) (2026-05-06)
 
 
