@@ -74,6 +74,10 @@ func (p *DevPanel) buildNav(active string) []ui.NavItem {
 	return nav
 }
 
+func (p *DevPanel) assetBase() string {
+	return p.cfg.Path + "/assets"
+}
+
 func (p *DevPanel) handleRequests() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		entries := p.Requests()
@@ -89,7 +93,7 @@ func (p *DevPanel) handleRequests() fiber.Handler {
 				RequestID: e.RequestID,
 			}
 		}
-		return render(c, ui.Requests(p.buildNav("Requests"), rows))
+		return render(c, ui.Requests(p.buildNav("Requests"), rows, p.assetBase()))
 	}
 }
 
@@ -107,7 +111,7 @@ func (p *DevPanel) handleRoutes() fiber.Handler {
 				})
 			}
 		}
-		return render(c, ui.Routes(p.buildNav("Routes"), rows))
+		return render(c, ui.Routes(p.buildNav("Routes"), rows, p.assetBase()))
 	}
 }
 
@@ -118,6 +122,6 @@ func (p *DevPanel) handleAddons() fiber.Handler {
 		for i, a := range registered {
 			rows[i] = addonToRow(a, p.cfg.Path)
 		}
-		return render(c, ui.Addons(p.buildNav("Addons"), rows))
+		return render(c, ui.Addons(p.buildNav("Addons"), rows, p.assetBase()))
 	}
 }

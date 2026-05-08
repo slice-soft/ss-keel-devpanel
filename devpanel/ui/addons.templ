@@ -9,8 +9,8 @@ type AddonRow struct {
 	DetailURL    string // link to the addon's event stream detail page
 }
 
-templ Addons(nav []NavItem, rows []AddonRow) {
-	@Layout("Addons", nav) {
+templ Addons(nav []NavItem, rows []AddonRow, assetBase string) {
+	@Layout("Addons", nav, assetBase) {
 		<div class="topbar">
 			<h1>Addons</h1>
 		</div>

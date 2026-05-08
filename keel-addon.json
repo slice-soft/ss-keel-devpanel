@@ -58,6 +58,10 @@
             "anchor": "before_modules",
             "guard": "setupDevPanel(",
             "code": "panel := setupDevPanel(app)\ndefer panel.Shutdown()"
+        },
+        {
+            "type": "note",
+            "message": "DevPanel is ready at http://localhost:7331/keel/panel\n\nTo capture addon and module logs in the Logs tab, wrap your logger with panel.WrapLogger:\n\n  appLog := panel.WrapLogger(appLogger) // add after setupDevPanel\n  db := setupGorm(app, appLog)           // use appLog for each addon and module\n\nappLog (type contracts.Logger) fans out to both stdout and the DevPanel Logs tab."
         }
     ]
 }

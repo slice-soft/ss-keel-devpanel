@@ -15,7 +15,7 @@ type AddonEventRow struct {
 	Detail map[string]string // flattened for display
 }
 
-func AddonDetail(nav []NavItem, addon AddonRow, streamURL string) templ.Component {
+func AddonDetail(nav []NavItem, addon AddonRow, streamURL string, assetBase string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -122,7 +122,7 @@ func AddonDetail(nav []NavItem, addon AddonRow, streamURL string) templ.Componen
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = Layout(addon.Label+" Events", nav).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(addon.Label+" Events", nav, assetBase).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -20,7 +20,7 @@ func (p *DevPanel) handleAddonDetail() fiber.Handler {
 		}
 		row := addonToRow(stream.addon, p.cfg.Path)
 		streamURL := fmt.Sprintf("%s/addons/%s/stream", p.cfg.Path, id)
-		return render(c, ui.AddonDetail(p.buildNav("Addons"), row, streamURL))
+		return render(c, ui.AddonDetail(p.buildNav("Addons"), row, streamURL, p.assetBase()))
 	}
 }
 
@@ -42,6 +42,20 @@ func (p *DevPanel) handleAddonStream() fiber.Handler {
 
 		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			defer cancel()
+
+			// Force header flush so EventSource.onopen fires immediately.
+			_, _ = fmt.Fprint(w, ": ping\n\n")
+			_ = w.Flush()
+
+			// Replay recent events so the client sees history on page load,
+			// not just events that happen while the tab is open.
+			for _, event := range stream.ring.snapshot() {
+				if err := writeAddonEvent(w, event); err != nil {
+					return
+				}
+			}
+			_ = w.Flush()
+
 			for event := range ch {
 				if err := writeAddonEvent(w, event); err != nil {
 					return

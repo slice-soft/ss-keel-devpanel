@@ -21,6 +21,7 @@ func (p *DevPanel) handleConfig() fiber.Handler {
 			p.buildEnvVarRows(),
 			p.buildRuntimeInfo(),
 			p.buildConfigAddonRows(),
+			p.assetBase(),
 		))
 	}
 }

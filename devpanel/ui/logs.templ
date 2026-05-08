@@ -10,8 +10,8 @@ type LogRow struct {
 	RequestID string
 }
 
-templ Logs(nav []NavItem, rows []LogRow, streamURL string) {
-	@Layout("Logs", nav) {
+templ Logs(nav []NavItem, rows []LogRow, streamURL string, assetBase string) {
+	@Layout("Logs", nav, assetBase) {
 		<div class="topbar">
 			<h1>Logs</h1>
 			<div style="display:flex;gap:8px;align-items:center;">
